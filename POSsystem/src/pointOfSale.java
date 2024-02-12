@@ -1,0 +1,657 @@
+
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.awt.print.*;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import java.sql.SQLException;
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+/**
+ *
+ * @author adaobi
+ */
+public class pointOfSale extends javax.swing.JFrame {
+  public static String Email;
+
+    /**
+     * Creates new form pointOfSale
+     */
+    public pointOfSale(String Email) {
+            this.Email = Email;
+        initComponents();
+    }
+   private void printReceipt() {
+    DefaultTableModel tableModel = (DefaultTableModel) jTable1.getModel();
+
+    // Check if there are any items in the jTable1
+    if (tableModel.getRowCount() == 0) {
+        JOptionPane.showMessageDialog(rootPane, "No items to print in the receipt.");
+        return;
+    }
+
+    // Initialize the receipt text
+    StringBuilder receiptText = new StringBuilder();
+    receiptText.append("Receipt\n\n");
+    receiptText.append(String.format("%-20s %-10s %-20s %-10s%n", "Name", "Quantity", "Price", "Total"));
+    receiptText.append("------------------------------------------------------------------------------------------------------------------------\n");
+
+    // Iterate through jTable1 rows and append each item to the receipt text
+    for (int i = 0; i < tableModel.getRowCount(); i++) {
+        String name = tableModel.getValueAt(i, 1).toString();
+        int quantity = Integer.parseInt(tableModel.getValueAt(i, 2).toString());
+        double price = Double.parseDouble(tableModel.getValueAt(i, 3).toString());
+        double total = Double.parseDouble(tableModel.getValueAt(i, 4).toString());
+
+        receiptText.append(String.format("%-20s %-10d %-20.2f %-10.2f%n", name, quantity, price, total));
+    }
+
+    receiptText.append("--------------------------------------------------------------------------------------------------------------------------\n");
+
+    // Get the overall total from jLabel5
+    String overallTotalText = jLabel5.getText().substring(7); // Extract the total value
+    receiptText.append(String.format("%-40s%-10s%n", "Overall Total:", overallTotalText));
+
+    // Set the receipt text to jTextArea1
+    jTextArea1.setText(receiptText.toString());
+
+    // Create a PrinterJob
+    PrinterJob job = PrinterJob.getPrinterJob();
+
+    // Create a Printable implementation for the receipt text
+    Printable printable = new ReceiptPrintable(receiptText.toString());
+
+    // Set the Printable and show the print dialog
+    job.setPrintable(printable);
+    if (job.printDialog()) {
+        try {
+            job.print();
+           /* notifications notificationsFrame = new notifications(receiptText.toString());
+    notificationsFrame.setVisible(true);*/
+
+        } catch (PrinterException e) {
+            JOptionPane.showMessageDialog(rootPane, "Error printing receipt: " + e.getMessage());
+        }
+    }
+}
+
+// Printable implementation for the receipt text
+private class ReceiptPrintable implements Printable {
+    private String receiptText;
+
+    public ReceiptPrintable(String receiptText) {
+        this.receiptText = receiptText;
+    }
+
+    @Override
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        if (pageIndex > 0) {
+            return NO_SUCH_PAGE;
+        }
+
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+
+        Font font = new Font("Courier New", Font.PLAIN, 12);
+        g2d.setFont(font);
+
+        String[] lines = receiptText.split("\n");
+        int lineHeight = g2d.getFontMetrics().getHeight();
+
+        int y = 0;
+        for (String line : lines) {
+            g2d.drawString(line, 0, y);
+            y += lineHeight;
+        }
+
+        return PAGE_EXISTS;
+    }
+}
+ private void showLowStockAlert(String productName, int currentQuantity) {
+        JOptionPane.showMessageDialog(rootPane, "Low Stock Alert: " + productName +
+                " has only " + currentQuantity + " units remaining.", "Low Stock", JOptionPane.WARNING_MESSAGE);
+    }
+
+    private void showProductFinishedAlert(String productName) {
+        JOptionPane.showMessageDialog(rootPane, productName + " is out of stock.", "Product Finished", JOptionPane.WARNING_MESSAGE);
+    }
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jTextField1 = new javax.swing.JTextField();
+        jTextField2 = new javax.swing.JTextField();
+        jTextField3 = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
+        jButton3 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jButton4 = new javax.swing.JButton();
+        jLabel10 = new javax.swing.JLabel();
+
+        jLabel8.setText("jLabel8");
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesandicons/Red Blue & White Remembrance Flower Memorial Day Instagram Post.png"))); // NOI18N
+        jLabel9.setText("jLabel9");
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(null);
+
+        jPanel1.setLayout(null);
+
+        jLabel1.setFont(new java.awt.Font("Impact", 0, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesandicons/icons8-sale-64.png"))); // NOI18N
+        jLabel1.setText("POINT OF SALES!!!");
+        jPanel1.add(jLabel1);
+        jLabel1.setBounds(40, 20, 287, 60);
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Product Code", "Name", "Quantity", "Price", "Total"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
+        jPanel1.add(jScrollPane1);
+        jScrollPane1.setBounds(30, 90, 492, 275);
+
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jTextField1);
+        jTextField1.setBounds(800, 80, 191, 22);
+        jPanel1.add(jTextField2);
+        jTextField2.setBounds(801, 228, 191, 22);
+
+        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField3ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jTextField3);
+        jTextField3.setBounds(801, 292, 191, 22);
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Name");
+        jPanel1.add(jLabel2);
+        jLabel2.setBounds(530, 90, 90, 16);
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Price");
+        jPanel1.add(jLabel3);
+        jLabel3.setBounds(530, 290, 90, 16);
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("Quantity");
+        jPanel1.add(jLabel4);
+        jLabel4.setBounds(530, 230, 110, 20);
+
+        jLabel5.setForeground(new java.awt.Color(255, 51, 51));
+        jLabel5.setText("TOTAL :");
+        jPanel1.add(jLabel5);
+        jLabel5.setBounds(30, 400, 193, 16);
+
+        jButton2.setText("Delete");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton2);
+        jButton2.setBounds(780, 340, 72, 23);
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText("Product Code");
+        jPanel1.add(jLabel6);
+        jLabel6.setBounds(530, 160, 120, 16);
+        jPanel1.add(jTextField4);
+        jTextField4.setBounds(800, 150, 191, 22);
+
+        jButton3.setText("CHECKOUT");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton3);
+        jButton3.setBounds(300, 400, 120, 23);
+
+        jButton5.setText("Print Receipt");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton5);
+        jButton5.setBounds(750, 640, 120, 23);
+
+        jButton6.setText("Clear");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton6);
+        jButton6.setBounds(670, 340, 72, 23);
+
+        jButton1.setText("Add to Cart");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1);
+        jButton1.setBounds(550, 340, 91, 23);
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jTextArea1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(204, 204, 204), 5, true));
+        jScrollPane2.setViewportView(jTextArea1);
+
+        jPanel1.add(jScrollPane2);
+        jScrollPane2.setBounds(580, 440, 440, 192);
+
+        jButton4.setText("Search Name");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton4);
+        jButton4.setBounds(880, 340, 110, 23);
+
+        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesandicons/Red Blue & White Remembrance Flower Memorial Day Instagram Post.png"))); // NOI18N
+        jPanel1.add(jLabel10);
+        jLabel10.setBounds(3, -4, 1070, 780);
+
+        getContentPane().add(jPanel1);
+        jPanel1.setBounds(-27, -1, 1040, 780);
+
+        setSize(new java.awt.Dimension(1026, 791));
+        setLocationRelativeTo(null);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+
+try {
+    String Name = jTextField1.getText();
+
+    String selectQuery = "SELECT * FROM product WHERE Name = ? ";
+
+    Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/pos", "root", "Nkoli1510");
+    PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+
+    // Execute the query and process the results
+    preparedStatement.setString(1, Name);
+
+    ResultSet resultSet = preparedStatement.executeQuery();
+
+    while (resultSet.next()) {
+        // Retrieve values from the result set
+        String retrievedproductID= resultSet.getString("productID");
+        String retrievedQuantity = resultSet.getString("Quantity");
+        String retrievedSellingPrice = resultSet.getString("SellingPrice");
+        String retrievedExpDate = resultSet.getString("Exp_D");
+        
+         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date currentDate = new Date();
+            Date expiryDate = dateFormat.parse(retrievedExpDate);
+            long differenceInMilliseconds = expiryDate.getTime() - currentDate.getTime();
+            long differenceInDays = TimeUnit.DAYS.convert(differenceInMilliseconds, TimeUnit.MILLISECONDS);
+            
+              if (differenceInDays <= 0){
+        JOptionPane.showMessageDialog(rootPane, "Warning: Product is  expired ");
+    }
+             
+        // Set values to the text fields
+        jTextField4.setText(retrievedproductID);
+        jTextField2.setText(retrievedQuantity);
+        jTextField3.setText(retrievedSellingPrice);
+    }
+
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(rootPane, e);
+}
+
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+
+        try {
+    Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/pos", "root", "Nkoli1510");
+    String email = pointOfSale.Email; // Replace "pointOfSale" with your actual class name
+
+    // Iterate through jTable1 rows
+    DefaultTableModel tableModel = (DefaultTableModel) jTable1.getModel();
+    for (int i = 0; i < tableModel.getRowCount(); i++) {
+        String productID = tableModel.getValueAt(i, 0).toString();
+        String name = tableModel.getValueAt(i, 1).toString();
+        int quantity = Integer.parseInt(tableModel.getValueAt(i, 2).toString());
+        double sellingPrice = Double.parseDouble(tableModel.getValueAt(i, 3).toString());
+        double total = Double.parseDouble(tableModel.getValueAt(i, 4).toString());
+
+        // Insert the values into the 'purchases' table
+        String insertQuery = "INSERT INTO purchases (productID, Name, Quantity, SellingPrice, Total, purchaseTimestamp, Email) VALUES (?, ?, ?, ?, ?, NOW(), ?)";
+
+        PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+        insertStatement.setString(1, productID);
+        insertStatement.setString(2, name);
+        insertStatement.setInt(3, quantity);
+        insertStatement.setDouble(4, sellingPrice);
+        insertStatement.setDouble(5, total);
+        insertStatement.setString(6, email);
+
+        // Execute the insert query
+        insertStatement.executeUpdate();
+
+        String updateStockQuery = "UPDATE product SET Quantity = Quantity - ? WHERE productID = ?";
+        PreparedStatement updateStockStatement = connection.prepareStatement(updateStockQuery);
+        updateStockStatement.setInt(1, quantity);
+        updateStockStatement.setString(2, productID);
+
+        // Execute the update query
+        updateStockStatement.executeUpdate();
+    }
+
+    // Clear jTable1 after successfully executing database operations
+   
+jButton5.setEnabled(true);
+   // JOptionPane.showMessageDialog(rootPane, "Items inserted into the 'purchases' table successfully. Stock updated.");
+
+} catch (Exception e) {
+   JOptionPane.showMessageDialog(rootPane, "purchase was sucessfully");
+
+     jButton5.setEnabled(false);
+}
+
+ // TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+DefaultTableModel dtm = (DefaultTableModel) jTable1.getModel();
+        int row = jTable1.getSelectedRow();
+        dtm.removeRow(row);        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+        jTextField4.setText("");  
+        
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    try {
+    DefaultTableModel tableModel = (DefaultTableModel) jTable1.getModel();
+
+    // Retrieve user input from text fields
+    String productID = jTextField4.getText();
+    String name = jTextField1.getText();
+    int userInputQuantity = Integer.parseInt(jTextField2.getText());
+    double sellingPrice = Double.parseDouble(jTextField3.getText());
+
+    // Check if the productID exists in the jTable1
+    int existingRow = findRowByProductID(productID, tableModel);
+    if (!isProductExpired(productID)) {
+    if (existingRow != -1) {
+        // Product already exists in jTable1, update the quantity
+        int originalQuantity = (int) tableModel.getValueAt(existingRow, 2);
+
+        if (userInputQuantity <= originalQuantity) {
+            // User input is valid, update jTable1
+            int updatedQuantity = userInputQuantity;
+            double total = updatedQuantity * sellingPrice;
+
+            // Update jTable1
+            tableModel.setValueAt(updatedQuantity, existingRow, 2);
+            tableModel.setValueAt(total, existingRow, 4);
+
+            // Calculate overall total in jTable1
+            double totalSum = calculateTotalSum(tableModel);
+
+            // Update jLabel5 with the total sum of all totals in jTable1
+            jLabel5.setText("Total: " + totalSum);
+
+                
+            
+            
+        } else {
+            // Show error message if user input quantity is higher than the original quantity
+            JOptionPane.showMessageDialog(rootPane, "User input quantity cannot be higher than the original quantity.");
+        }
+    } else {
+         int currentQuantity = getCurrentQuantityFromProductTable(productID);
+            if (currentQuantity >= 5) {
+        double total = userInputQuantity * sellingPrice;
+        Object[] row = new Object[]{productID, name, userInputQuantity, sellingPrice, total};
+        tableModel.addRow(row);
+
+        // Calculate overall total in jTable1
+        double totalSum = calculateTotalSum(tableModel);
+
+        // Update jLabel5 with the total sum of all totals in jTable1
+        jLabel5.setText("Total: " + totalSum);
+
+        // Clear text fields for the next input
+        jTextField4.setText("");
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+         checkLowStock();
+    }
+
+    }
+    }
+}
+    catch (Exception e) {
+    JOptionPane.showMessageDialog(rootPane,"Error: " + e.getMessage());
+}
+    }
+    
+private void checkLowStock() {
+    DefaultTableModel tableModel = (DefaultTableModel) jTable1.getModel();
+    for (int i = 0; i < tableModel.getRowCount(); i++) {
+        String productID = tableModel.getValueAt(i, 0).toString();
+        int userInputQuantity = Integer.parseInt(tableModel.getValueAt(i, 2).toString());
+
+        // Query the product table to get the current quantity
+        int currentQuantity = getCurrentQuantityFromProductTable(productID);
+
+        if (currentQuantity - userInputQuantity < 3 && currentQuantity > 0) {
+            // Display a low stock alert
+           // showLowStockAlert(tableModel.getValueAt(i, 1).toString(), currentQuantity);
+        } else if (currentQuantity == 0) {
+            // Display a product finished message
+            showProductFinishedAlert(tableModel.getValueAt(i, 1).toString());
+        }
+    }
+}
+// Helper method to query the product table and get the current quantity
+private int getCurrentQuantityFromProductTable(String productID) {
+    try {
+        String selectQuery = "SELECT Quantity FROM product WHERE ProductID = ?";
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/pos", "root", "Nkoli1510");
+        PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+        preparedStatement.setString(1, productID);
+
+        // Execute the query and process the results
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt("Quantity");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+// Helper method to find the row index in jTable1 based on productID
+private int findRowByProductID(String productID, DefaultTableModel tableModel) {
+    for (int i = 0; i < tableModel.getRowCount(); i++) {
+        String rowProductID = tableModel.getValueAt(i, 0).toString();
+        if (rowProductID.equals(productID)) {
+            return i;
+        }
+    }
+    return -1; // Return -1 if not found
+}
+
+// Helper method to calculate the total sum in jTable1
+private double calculateTotalSum(DefaultTableModel tableModel) {
+    double totalSum = 0.0;
+    for (int i = 0; i < tableModel.getRowCount(); i++) {
+        double rowTotal = (double) tableModel.getValueAt(i, 4);
+        totalSum += rowTotal;
+    }
+    return totalSum;
+}
+private boolean isProductExpired(String productID) {
+    try {
+        String selectQuery = "SELECT Exp_D FROM product WHERE ProductID = ?";
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/pos", "root", "Nkoli1510");
+        PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+        preparedStatement.setString(1, productID);
+
+        // Execute the query and process the results
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            Date expiryDate = resultSet.getDate("Exp_D");
+            Date currentDate = new Date();
+            return currentDate.after(expiryDate);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+
+// TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+   printReceipt();  
+   
+   // TODO add your handling code here:
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(pointOfSale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(pointOfSale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(pointOfSale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(pointOfSale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new pointOfSale(" ").setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
+    // End of variables declaration//GEN-END:variables
+}
